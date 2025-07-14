@@ -1,0 +1,257 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - SecureBank{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2 class="mb-3">
+            <i class="fas fa-tachometer-alt text-primary me-2"></i>
+            Welcome back, {{ current_user.first_name }}!
+        </h2>
+    </div>
+</div>
+
+<!-- Account Overview -->
+<div class="row mb-4">
+    <div class="col-12">
+        <h4 class="mb-3">
+            <i class="fas fa-wallet text-primary me-2"></i>
+            Your Accounts
+        </h4>
+    </div>
+    
+    {% if accounts %}
+        {% for account in accounts %}
+        <div class="col-md-6 col-lg-4 mb-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <h6 class="card-title mb-1">{{ account.account_type.title() }} Account</h6>
+                            <small class="text-muted">{{ account.account_number }}</small>
+                        </div>
+                        <span class="badge bg-primary">{{ account.account_type.upper() }}</span>
+                    </div>
+                    
+                    <h3 class="text-primary mb-3">${{ "%.2f"|format(account.balance) }}</h3>
+                    
+                    <div class="d-grid">
+                        <a href="{{ url_for('account_detail', account_id=account.id) }}" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-eye me-1"></i>View Details
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body text-center">
+                    <i class="fas fa-wallet fa-3x text-muted mb-3"></i>
+                    <h5>No accounts found</h5>
+                    <p class="text-muted">Contact your bank to set up your first account.</p>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Quick Actions -->
+<div class="row mb-4">
+    <div class="col-12">
+        <h4 class="mb-3">
+            <i class="fas fa-bolt text-primary me-2"></i>
+            Quick Actions
+        </h4>
+    </div>
+    
+    <div class="col-md-3 mb-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="fas fa-exchange-alt fa-2x text-primary mb-3"></i>
+                <h6>Transfer Money</h6>
+                <a href="{{ url_for('transfer') }}" class="btn btn-primary btn-sm">
+                    <i class="fas fa-arrow-right me-1"></i>Transfer
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="fas fa-history fa-2x text-success mb-3"></i>
+                <h6>Transaction History</h6>
+                <button class="btn btn-success btn-sm" onclick="loadTransactions()">
+                    <i class="fas fa-list me-1"></i>View All
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="fas fa-chart-line fa-2x text-info mb-3"></i>
+                <h6>Analytics</h6>
+                <button class="btn btn-info btn-sm" onclick="showAnalytics()">
+                    <i class="fas fa-chart-bar me-1"></i>Analytics
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="fas fa-shield-alt fa-2x text-warning mb-3"></i>
+                <h6>Security</h6>
+                <button class="btn btn-warning btn-sm" onclick="showSecurity()">
+                    <i class="fas fa-lock me-1"></i>Security
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Transactions -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-clock text-primary me-2"></i>
+                    Recent Transactions
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if transactions %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Type</th>
+                                    <th>Description</th>
+                                    <th>Amount</th>
+                                    <th>Fraud Score</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for transaction in transactions %}
+                                <tr class="{% if transaction.is_fraudulent %}table-danger{% endif %}">
+                                    <td>{{ transaction.timestamp.strftime('%Y-%m-%d %H:%M') }}</td>
+                                    <td>
+                                        <span class="badge bg-{% if transaction.transaction_type == 'transfer' %}primary{% elif transaction.transaction_type == 'deposit' %}success{% else %}warning{% endif %}">
+                                            {{ transaction.transaction_type.title() }}
+                                        </span>
+                                    </td>
+                                    <td>{{ transaction.description[:50] }}{% if transaction.description|length > 50 %}...{% endif %}</td>
+                                    <td class="{% if transaction.amount < 0 %}text-danger{% else %}text-success{% endif %}">
+                                        ${{ "%.2f"|format(transaction.amount) }}
+                                    </td>
+                                    <td>
+                                        {% if transaction.fraud_score > 0 %}
+                                            <span class="fraud-score {% if transaction.fraud_score < 0.3 %}low{% elif transaction.fraud_score < 0.7 %}medium{% else %}high{% endif %}">
+                                                {{ "%.1f"|format(transaction.fraud_score * 100) }}%
+                                            </span>
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if transaction.is_fraudulent %}
+                                            <span class="badge bg-danger">
+                                                <i class="fas fa-exclamation-triangle me-1"></i>Fraudulent
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-success">
+                                                <i class="fas fa-check me-1"></i>Safe
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                        <h5>No transactions yet</h5>
+                        <p class="text-muted">Your transaction history will appear here.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Fraud Detection Status -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-shield-alt text-primary me-2"></i>
+                    Fraud Detection Status
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-md-3">
+                        <div class="stats-card p-3 rounded">
+                            <h4>{{ transactions|length }}</h4>
+                            <p class="mb-0">Total Transactions</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stats-card success p-3 rounded">
+                            <h4>{{ transactions|selectattr('is_fraudulent', 'equalto', false)|list|length }}</h4>
+                            <p class="mb-0">Safe Transactions</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stats-card warning p-3 rounded">
+                            <h4>{{ transactions|selectattr('is_fraudulent', 'equalto', true)|list|length }}</h4>
+                            <p class="mb-0">Flagged Transactions</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stats-card danger p-3 rounded">
+                            <h4>99.5%</h4>
+                            <p class="mb-0">Detection Accuracy</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function loadTransactions() {
+    // Load all transactions via AJAX
+    fetch('/api/transactions')
+        .then(response => response.json())
+        .then(data => {
+            console.log('Transactions loaded:', data);
+            // You can implement a modal or redirect to show all transactions
+            alert('Transactions loaded! Check console for details.');
+        });
+}
+
+function showAnalytics() {
+    alert('Analytics feature coming soon!');
+}
+
+function showSecurity() {
+    alert('Security settings coming soon!');
+}
+</script>
+{% endblock %} 

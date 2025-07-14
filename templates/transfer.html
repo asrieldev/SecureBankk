@@ -1,0 +1,237 @@
+{% extends "base.html" %}
+
+{% block title %}Transfer Money - SecureBank{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">
+                    <i class="fas fa-exchange-alt text-primary me-2"></i>
+                    Transfer Money
+                </h4>
+            </div>
+            <div class="card-body p-4">
+                <form method="POST" id="transferForm">
+                    <div class="mb-3">
+                        <label for="from_account" class="form-label">
+                            <i class="fas fa-wallet me-2"></i>From Account
+                        </label>
+                        <select class="form-control" id="from_account" name="from_account" required>
+                            <option value="">Select your account</option>
+                            {% for account in accounts %}
+                            <option value="{{ account.id }}">
+                                {{ account.account_type.title() }} - {{ account.account_number }} 
+                                (Balance: ${{ "%.2f"|format(account.balance) }})
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="to_account" class="form-label">
+                            <i class="fas fa-user me-2"></i>To Account Number
+                        </label>
+                        <input type="text" class="form-control" id="to_account" name="to_account" 
+                               placeholder="Enter recipient account number" required>
+                        <div class="form-text">Enter the account number of the recipient</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="amount" class="form-label">
+                            <i class="fas fa-dollar-sign me-2"></i>Amount
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input type="number" class="form-control" id="amount" name="amount" 
+                                   step="0.01" min="0.01" placeholder="0.00" required>
+                        </div>
+                        <div class="form-text">Minimum transfer amount: $1.00</div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="description" class="form-label">
+                            <i class="fas fa-comment me-2"></i>Description
+                        </label>
+                        <textarea class="form-control" id="description" name="description" 
+                                  rows="3" placeholder="Enter transfer description (optional)"></textarea>
+                    </div>
+                    
+                    <!-- Fraud Detection Preview -->
+                    <div class="mb-4" id="fraudPreview" style="display: none;">
+                        <div class="card border-warning">
+                            <div class="card-header bg-warning text-dark">
+                                <h6 class="mb-0">
+                                    <i class="fas fa-shield-alt me-2"></i>
+                                    Fraud Detection Preview
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <p class="mb-1"><strong>Risk Level:</strong></p>
+                                        <span class="fraud-score" id="riskLevel">Calculating...</span>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <p class="mb-1"><strong>Fraud Score:</strong></p>
+                                        <span id="fraudScore">-</span>
+                                    </div>
+                                </div>
+                                <div class="mt-2">
+                                    <p class="mb-1"><strong>Risk Factors:</strong></p>
+                                    <ul class="list-unstyled" id="riskFactors">
+                                        <li><i class="fas fa-spinner fa-spin me-2"></i>Analyzing transaction...</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-paper-plane me-2"></i>Send Transfer
+                        </button>
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Transfer Guidelines -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-info-circle text-primary me-2"></i>
+                    Transfer Guidelines & Security
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6><i class="fas fa-check-circle text-success me-2"></i>Security Features</h6>
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-shield-alt text-primary me-2"></i>Real-time fraud detection</li>
+                            <li><i class="fas fa-lock text-primary me-2"></i>Encrypted transactions</li>
+                            <li><i class="fas fa-bell text-primary me-2"></i>Instant fraud alerts</li>
+                            <li><i class="fas fa-chart-line text-primary me-2"></i>Transaction monitoring</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6><i class="fas fa-exclamation-triangle text-warning me-2"></i>Important Notes</h6>
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-clock text-warning me-2"></i>Transfers are processed immediately</li>
+                            <li><i class="fas fa-undo text-warning me-2"></i>Cannot be reversed once sent</li>
+                            <li><i class="fas fa-user-check text-warning me-2"></i>Verify recipient details carefully</li>
+                            <li><i class="fas fa-phone text-warning me-2"></i>Contact support for large amounts</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('transferForm');
+    const amountInput = document.getElementById('amount');
+    const fraudPreview = document.getElementById('fraudPreview');
+    
+    // Show fraud preview when amount changes
+    amountInput.addEventListener('input', function() {
+        const amount = parseFloat(this.value);
+        if (amount > 0) {
+            showFraudPreview(amount);
+        } else {
+            fraudPreview.style.display = 'none';
+        }
+    });
+    
+    // Form validation
+    form.addEventListener('submit', function(e) {
+        const amount = parseFloat(amountInput.value);
+        const fromAccount = document.getElementById('from_account').value;
+        
+        if (!fromAccount) {
+            e.preventDefault();
+            alert('Please select a source account');
+            return;
+        }
+        
+        if (amount < 1) {
+            e.preventDefault();
+            alert('Minimum transfer amount is $1.00');
+            return;
+        }
+        
+        // Show confirmation for large amounts
+        if (amount > 1000) {
+            if (!confirm(`Are you sure you want to transfer $${amount.toFixed(2)}? This is a large amount.`)) {
+                e.preventDefault();
+                return;
+            }
+        }
+    });
+});
+
+function showFraudPreview(amount) {
+    const fraudPreview = document.getElementById('fraudPreview');
+    const riskLevel = document.getElementById('riskLevel');
+    const fraudScore = document.getElementById('fraudScore');
+    const riskFactors = document.getElementById('riskFactors');
+    
+    // Simulate fraud detection analysis
+    let risk = 'low';
+    let score = Math.random() * 0.3;
+    let factors = [];
+    
+    if (amount > 1000) {
+        risk = 'medium';
+        score = 0.3 + Math.random() * 0.4;
+        factors.push('High transaction amount');
+    }
+    
+    if (amount > 5000) {
+        risk = 'high';
+        score = 0.7 + Math.random() * 0.3;
+        factors.push('Very high transaction amount');
+    }
+    
+    // Add random factors for demonstration
+    if (Math.random() > 0.7) {
+        factors.push('Unusual transaction time');
+        score += 0.1;
+    }
+    
+    if (Math.random() > 0.8) {
+        factors.push('New recipient account');
+        score += 0.15;
+    }
+    
+    // Update UI
+    riskLevel.className = `fraud-score ${risk}`;
+    riskLevel.textContent = risk.toUpperCase();
+    
+    fraudScore.textContent = `${(score * 100).toFixed(1)}%`;
+    
+    if (factors.length > 0) {
+        riskFactors.innerHTML = factors.map(factor => 
+            `<li><i class="fas fa-exclamation-circle text-warning me-2"></i>${factor}</li>`
+        ).join('');
+    } else {
+        riskFactors.innerHTML = '<li><i class="fas fa-check-circle text-success me-2"></i>No risk factors detected</li>';
+    }
+    
+    fraudPreview.style.display = 'block';
+}
+</script>
+{% endblock %} 

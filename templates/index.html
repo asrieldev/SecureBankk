@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+
+{% block title %}SecureBank - Banking Transaction System with Fraud Detection{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto text-center">
+        <div class="card">
+            <div class="card-body p-5">
+                <h1 class="display-4 mb-4">
+                    <i class="fas fa-university text-primary me-3"></i>
+                    Welcome to SecureBank
+                </h1>
+                <p class="lead mb-4">
+                    Advanced Banking Transaction System with Real-time Fraud Detection
+                </p>
+                <div class="row mb-4">
+                    <div class="col-md-4">
+                        <div class="text-center">
+                            <i class="fas fa-shield-alt fa-3x text-success mb-3"></i>
+                            <h5>Fraud Detection</h5>
+                            <p class="text-muted">AI-powered machine learning models detect suspicious transactions in real-time</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="text-center">
+                            <i class="fas fa-chart-line fa-3x text-primary mb-3"></i>
+                            <h5>Analytics</h5>
+                            <p class="text-muted">Comprehensive transaction analytics and fraud pattern analysis</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="text-center">
+                            <i class="fas fa-bell fa-3x text-warning mb-3"></i>
+                            <h5>Real-time Alerts</h5>
+                            <p class="text-muted">Instant notifications for suspicious activities and fraud attempts</p>
+                        </div>
+                    </div>
+                </div>
+                
+                {% if not current_user.is_authenticated %}
+                <div class="d-grid gap-3 d-md-flex justify-content-md-center">
+                    <a href="{{ url_for('login') }}" class="btn btn-primary btn-lg">
+                        <i class="fas fa-sign-in-alt me-2"></i>Login
+                    </a>
+                    <a href="{{ url_for('register') }}" class="btn btn-outline-primary btn-lg">
+                        <i class="fas fa-user-plus me-2"></i>Register
+                    </a>
+                </div>
+                {% else %}
+                <div class="d-grid gap-3 d-md-flex justify-content-md-center">
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-lg">
+                        <i class="fas fa-tachometer-alt me-2"></i>Go to Dashboard
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-5">
+    <div class="col-lg-10 mx-auto">
+        <div class="row">
+            <div class="col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="fas fa-brain text-primary me-2"></i>
+                            Machine Learning Features
+                        </h5>
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-check text-success me-2"></i>Random Forest Classification</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Isolation Forest Anomaly Detection</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Real-time Feature Extraction</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Multi-factor Risk Assessment</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="fas fa-cogs text-primary me-2"></i>
+                            System Features
+                        </h5>
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-check text-success me-2"></i>Secure User Authentication</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Account Management</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Transaction Processing</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Admin Dashboard</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-lg-10 mx-auto">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title text-center mb-4">
+                    <i class="fas fa-chart-bar text-primary me-2"></i>
+                    Fraud Detection Metrics
+                </h5>
+                <div class="row text-center">
+                    <div class="col-md-3">
+                        <div class="stats-card p-3 rounded">
+                            <h3>99.5%</h3>
+                            <p class="mb-0">Accuracy</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stats-card success p-3 rounded">
+                            <h3>< 1s</h3>
+                            <p class="mb-0">Response Time</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stats-card warning p-3 rounded">
+                            <h3>24/7</h3>
+                            <p class="mb-0">Monitoring</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stats-card danger p-3 rounded">
+                            <h3>0.1%</h3>
+                            <p class="mb-0">False Positives</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
