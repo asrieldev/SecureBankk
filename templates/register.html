@@ -1,78 +1,281 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Register - SecureBank</title>
 
-{% block title %}Register - SecureBank{% endblock %}
+    <!-- Font Awesome for icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Bootstrap for layout and design -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 
-{% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-8 col-lg-6">
-        <div class="card">
-            <div class="card-body p-5">
-                <div class="text-center mb-4">
-                    <i class="fas fa-user-plus fa-3x text-primary mb-3"></i>
-                    <h2>Create Your Account</h2>
-                    <p class="text-muted">Join SecureBank for secure banking with fraud protection</p>
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(-45deg, #0071e3, #f5f5f7, #888);
+            background-size: 400% 400%;
+            animation: gradientBG 12s ease infinite;
+            position: relative;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 40px;
+            backdrop-filter: blur(15px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            width: 500px; /* Increased width */
+            max-width: 90%;
+            color: #111;
+            text-align: center;
+            position: relative;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .login-header i {
+            font-size: 40px;
+            padding: 14px;
+            border-radius: 50%;
+            background: rgba(0, 113, 227, 0.15);
+            color: #0071e3;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            display: inline-block;
+            margin-bottom: 12px;
+        }
+
+        .login-header h2 {
+            font-size: 30px; /* Increased font size */
+            font-weight: 700;
+            color: #111;
+            margin-bottom: 8px;
+        }
+
+        .login-header h2 span {
+            color: #0071e3;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            font-size: 14px;
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="tel"],
+        input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid rgba(0, 0, 0, 0.15);
+            outline: none;
+            font-size: 14px;
+            transition: 0.2s;
+        }
+
+        input:focus {
+            border-color: #0071e3;
+            box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.25);
+        }
+
+        .btn {
+            display: inline-block;
+            width: 100%;
+            padding: 12px;
+            border-radius: 12px;
+            border: none;
+            background: #0071e3;
+            color: white;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.25s;
+        }
+
+        .btn:hover {
+            background: #005bb5;
+        }
+
+        .footer-text {
+            margin-top: 16px;
+            font-size: 14px;
+            text-align: center;
+            color: #333;
+        }
+
+        .footer-text a {
+            color: #0071e3;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .footer-text a:hover {
+            text-decoration: underline;
+        }
+
+        /* Modal Styles */
+        .modal-bg {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="glass">
+        <div class="login-header">
+            <i class="fas fa-user-plus fa-3x text-primary mb-3"></i>
+            <h2>Create Your Account</h2>
+            <p class="text-muted">Join SecureBank for secure banking with fraud protection</p>
+        </div>
+
+        <form method="POST">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="first_name">
+                        <i class="fas fa-user me-2"></i>First Name
+                    </label>
+                    <input type="text" class="form-control" id="first_name" name="first_name" required>
                 </div>
-                
-                <form method="POST">
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="first_name" class="form-label">
-                                <i class="fas fa-user me-2"></i>First Name
-                            </label>
-                            <input type="text" class="form-control" id="first_name" name="first_name" required>
-                        </div>
-                        
-                        <div class="col-md-6 mb-3">
-                            <label for="last_name" class="form-label">
-                                <i class="fas fa-user me-2"></i>Last Name
-                            </label>
-                            <input type="text" class="form-control" id="last_name" name="last_name" required>
-                        </div>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="username" class="form-label">
-                            <i class="fas fa-at me-2"></i>Username
-                        </label>
-                        <input type="text" class="form-control" id="username" name="username" required>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="email" class="form-label">
-                            <i class="fas fa-envelope me-2"></i>Email Address
-                        </label>
-                        <input type="email" class="form-control" id="email" name="email" required>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="phone" class="form-label">
-                            <i class="fas fa-phone me-2"></i>Phone Number
-                        </label>
-                        <input type="tel" class="form-control" id="phone" name="phone" required>
-                    </div>
-                    
-                    <div class="mb-4">
-                        <label for="password" class="form-label">
-                            <i class="fas fa-lock me-2"></i>Password
-                        </label>
-                        <input type="password" class="form-control" id="password" name="password" required>
-                        <div class="form-text">Password must be at least 8 characters long</div>
-                    </div>
-                    
-                    <div class="d-grid">
-                        <button type="submit" class="btn btn-primary btn-lg">
-                            <i class="fas fa-user-plus me-2"></i>Create Account
-                        </button>
-                    </div>
-                </form>
-                
-                <div class="text-center mt-4">
-                    <p class="mb-0">Already have an account? 
-                        <a href="{{ url_for('login') }}" class="text-primary">Login here</a>
-                    </p>
+
+                <div class="col-md-6 mb-3">
+                    <label for="last_name">
+                        <i class="fas fa-user me-2"></i>Last Name
+                    </label>
+                    <input type="text" class="form-control" id="last_name" name="last_name" required>
                 </div>
             </div>
+
+            <div class="mb-3">
+                <label for="username">
+                    <i class="fas fa-at me-2"></i>Username
+                </label>
+                <input type="text" class="form-control" id="username" name="username" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="email">
+                    <i class="fas fa-envelope me-2"></i>Email Address
+                </label>
+                <input type="email" class="form-control" id="email" name="email" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="phone">
+                    <i class="fas fa-phone me-2"></i>Phone Number
+                </label>
+                <input type="tel" class="form-control" id="phone" name="phone" required>
+            </div>
+
+            <div class="mb-4">
+                <label for="password">
+                    <i class="fas fa-lock me-2"></i>Password
+                </label>
+                <input type="password" class="form-control" id="password" name="password" required>
+                <div class="form-text">Password must be at least 8 characters long</div>
+            </div>
+
+            <div class="form-check mb-3">
+                <input type="checkbox" class="form-check-input" id="terms" required>
+                <label class="form-check-label" for="terms" data-toggle="modal" data-target="#termsModal">I agree to the <a href="#" data-toggle="modal" data-target="#termsModal">Terms and Conditions</a></label>
+            </div>
+
+            <div class="d-grid">
+                <button type="submit" class="btn btn-primary btn-lg">
+                    <i class="fas fa-user-plus me-2"></i>Create Account
+                </button>
+            </div>
+        </form>
+
+        <div class="footer-text">
+            Already have an account? <a href="{{ url_for('login') }}" class="text-primary">Login here</a>
         </div>
     </div>
-</div>
-{% endblock %} 
+
+    <!-- Modal for Terms and Conditions -->
+    <div class="modal-bg" id="termsModal">
+        <div class="modal-content">
+            <span class="modal-close" id="modalClose">&times;</span>
+            <h3>Terms & Conditions</h3>
+            <p>Welcome to SecureBank! Before creating an account, please read the following carefully:</p>
+            <ul>
+                <li>You must provide accurate and complete information during signup.</li>
+                <li>Your account credentials must be kept private.</li>
+                <li>Unauthorized use of another user's account is prohibited.</li>
+                <li>SecureBank is not responsible for losses due to user negligence.</li>
+                <li>By signing up, you agree to comply with our policies and updates.</li>
+            </ul>
+            <p>Click "I agree" checkbox after reviewing to continue with signup.</p>
+        </div>
+    </div>
+
+    <script>
+        // Open the Terms Modal
+        const modal = document.getElementById('termsModal');
+        const modalClose = document.getElementById('modalClose');
+        
+        // Show the modal when the link is clicked
+        document.querySelector('a[data-toggle="modal"]').addEventListener("click", () => {
+            modal.style.display = "flex";
+        });
+
+        // Close the modal when the close button is clicked
+        modalClose.addEventListener("click", () => {
+            modal.style.display = "none";
+        });
+
+        // Close the modal if the user clicks outside of the modal content
+        window.addEventListener("click", (event) => {
+            if (event.target === modal) {
+                modal.style.display = "none";
+            }
+        });
+    </script>
+</body>
+</html>

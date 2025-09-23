@@ -22,8 +22,9 @@
         }
         
         .navbar {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            background: white;
+            box-shadow: 0 2px 10px rgb(240, 238, 238);
+            
         }
         
         .navbar-brand {
@@ -31,6 +32,23 @@
             font-size: 1.5rem;
         }
         
+         /* Styling the footer to always be at the bottom */
+    footer {
+        background: transparent;
+        color: #000;
+        padding: 15px 0;
+        text-align: center;
+        width: 100%;
+        font-size: 0.9rem;
+        margin-top: auto;
+    }
+
+    /* Optional: Make sure the footer text is centered */
+    footer .container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
         .card {
             border: none;
             border-radius: 15px;
@@ -55,7 +73,7 @@
             border-radius: 25px;
             padding: 10px 25px;
         }
-        
+                  
         .btn-warning {
             background: linear-gradient(135deg, var(--warning-color), #e67e22);
             border: none;
@@ -135,35 +153,36 @@
         }
     </style>
 </head>
-<body><nav class="navbar navbar-expand-lg navbar-dark">
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light" style="color: black;">
     <div class="container">
         <a class="navbar-brand" href="{{ url_for('index') }}">
-            <i class="fas fa-university me-2"></i>SecureBank
+            SecureBank
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav me-auto">
+            <ul class="navbar-nav ms-auto">  <!-- Updated this line to align right -->
                 {% if current_user.is_authenticated %}
                 <li class="nav-item">
                     <a class="nav-link" href="{{ url_for('dashboard') }}">
-                        <i class="fas fa-tachometer-alt me-1"></i>Dashboard
+                        <i ></i>Dashboard
                     </a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="{{ url_for('transfer') }}">
-                        <i class="fas fa-exchange-alt me-1"></i>Transfer
+                        <i ></i>Transfer
                     </a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="{{ url_for('cards') }}">
-                        <i class="fas fa-credit-card me-1"></i>Cards
+                        <i ></i>Cards
                     </a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="{{ url_for('subscriptions') }}">
-                        <i class="fas fa-cogs me-1"></i>Subscriptions
+                        <i></i>Subscriptions
                     </a>
                 </li>
                 {% if current_user.is_admin %}
@@ -190,12 +209,12 @@
                 {% else %}
                 <li class="nav-item">
                     <a class="nav-link" href="{{ url_for('login') }}">
-                        <i class="fas fa-sign-in-alt me-1"></i>Login
+                        <i ></i><strong>Login</strong>
                     </a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="{{ url_for('register') }}">
-                        <i class="fas fa-user-plus me-1"></i>Register
+                        <i ></i><strong>Sign Up</strong>
                     </a>
                 </li>
                 {% endif %}
@@ -204,7 +223,7 @@
     </div>
 </nav>
 
-    
+ 
 
     <main class="container mt-4">
         {% with messages = get_flashed_messages() %}
@@ -225,4 +244,11 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     {% block scripts %}{% endblock %}
 </body>
+<!-- Footer -->
+<footer>
+    <div class="container">
+        <p>&copy; 2025 SecureBank. All rights reserved.</p>
+    </div>
+</footer>
+ 
 </html> 
