@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Cards{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <h2 class="mb-4">Your Cards</h2>
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <p class="text-muted">Manage your saved cards here.</p>
+    <button class="btn btn-primary btn-animate" data-bs-toggle="modal" data-bs-target="#addCardModal">
+      <i class="fas fa-plus me-1"></i> Add Card
+    </button>
+  </div>
+
+  {% if cards %}
+  <div class="row g-4">
+    {% for card in cards %}
+    <div class="col-md-4">
+      <div class="flip-card">
+        <div class="flip-card-inner" id="cardInner{{ card.id }}">
+          <!-- Card Front -->
+          <div class="flip-card-front">
+            <div class="card-gradient">
+              <div class="d-flex justify-content-between align-items-center">
+                <div class="chip3d"></div>
+                <img src="{{ url_for('static', filename='images/visa.png') }}" alt="Card Logo" class="card-logo">
+              </div>
+              <h5 class="mt-5 mb-2 card-number">
+                {{ card.card_number[:4] }} **** **** {{ card.card_number[-4:] }}
+              </h5>
+              <div class="d-flex justify-content-between card-footer">
+                <small>Expiry: {{ card.expiry_date }}</small>
+                <small>Status: {% if card.blocked %}<span class="text-danger">Blocked</span>{% else %}<span class="text-success">Active</span>{% endif %}</small>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card Back -->
+          <div class="flip-card-back">
+            <div class="card-gradient-back">
+              <div class="magnetic-strip"></div>
+              <div class="mt-3 text-white">
+                <p class="mb-1"><strong>CVV:</strong> {{ card.cvv }}</p>
+                <p class="mb-0"><strong>Account ID:</strong> {{ card.account_id }}</p>
+              </div>
+              <div class="d-flex justify-content-end mt-auto">
+                <small class="text-white">SecureBank</small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card Actions -->
+        <div class="mt-2 d-flex gap-2 justify-content-between">
+          <button class="btn btn-light flex-grow-1" onclick="flipCard('{{ card.id }}')">Flip</button>
+
+          <!-- Block/Unblock Button as a Form -->
+          <form action="{{ url_for('toggle_card_view', card_id=card.id) }}" method="POST" class="flex-grow-1">
+            <button type="submit" class="btn btn-light w-100">
+              {% if card.blocked %}Unblock{% else %}Block{% endif %}
+            </button>
+          </form>
+
+          <!-- Delete Card Form -->
+          <form action="{{ url_for('delete_card', card_id=card.id) }}" method="POST" class="flex-grow-1">
+            <button type="submit" class="btn btn-danger w-100">Delete</button>
+          </form>
+        </div>
+
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="alert alert-info">No cards found. Add a new card to get started.</div>
+  {% endif %}
+</div>
+
+<!-- Add Card Modal -->
+<div class="modal fade" id="addCardModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content shadow-lg border-0">
+      <form method="POST" action="{{ url_for('cards') }}">
+        <div class="modal-header bg-gradient p-3">
+          <h5 class="modal-title fw-bold">Add New Card</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body p-4">
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Card Number</label>
+            <input type="text" class="form-control rounded-pill shadow-sm" name="card_number" maxlength="16" placeholder="1234 5678 9012 3456" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Expiry Date</label>
+            <input type="month" class="form-control rounded-pill shadow-sm" name="expiry_date" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold">CVV</label>
+            <input type="password" class="form-control rounded-pill shadow-sm" name="cvv" maxlength="3" placeholder="***" required>
+          </div>
+        </div>
+        <div class="modal-footer d-flex justify-content-between">
+          <button type="submit" class="btn btn-primary flex-grow-1">Add Card</button>
+          <button type="button" class="btn btn-secondary flex-grow-1" data-bs-dismiss="modal">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<style>
+/* Flip card container */
+.flip-card { perspective: 1000px; }
+.flip-card-inner { position: relative; width: 100%; height: 220px; transition: transform 0.8s; transform-style: preserve-3d; }
+.flip-card-front, .flip-card-back { backface-visibility: hidden; width: 100%; height: 100%; position: absolute; top:0; left:0; border-radius: 15px; }
+.flip-card-front .card-gradient { padding: 20px; border-radius: 15px; height: 100%; display:flex; flex-direction:column; justify-content:space-between; color:white; background: linear-gradient(135deg, #1a1f71, #4b7bec); animation: shimmer 5s infinite linear; }
+.flip-card-back .card-gradient-back { padding: 20px; border-radius: 15px; height: 100%; display:flex; flex-direction:column; justify-content:flex-start; color:white; background: linear-gradient(135deg, #4b7bec, #1a1f71); }
+
+@keyframes shimmer {
+  0% { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+
+.chip3d { width: 50px; height: 35px; border-radius: 8px; background: linear-gradient(145deg,#d1d1d1,#a0a0a0); box-shadow: inset 2px 2px 5px rgba(255,255,255,0.5), inset -2px -2px 5px rgba(0,0,0,0.2); }
+.magnetic-strip { background: #333; height: 40px; border-radius: 5px; }
+
+.card-logo { width:50px; }
+.card-number { font-size: 1.2rem; letter-spacing: 3px; }
+.card-footer { font-size: 0.85rem; }
+.flip-card:hover { transform: scale(1.05); box-shadow: 0 15px 25px rgba(0,0,0,0.4); transition: all 0.4s ease; }
+.flip-card-back { transform: rotateY(180deg); }
+</style>
+
+<script>
+function flipCard(cardId){
+  const card = document.getElementById(`cardInner${cardId}`);
+  card.style.transform = card.style.transform === "rotateY(180deg)" ? "rotateY(0deg)" : "rotateY(180deg)";
+}
+</script>
+{% endblock %}

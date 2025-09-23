@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}Manage Subscriptions{% endblock %}
+
+{% block content %}
+<h2>Your Subscriptions</h2>
+<a href="#" data-bs-toggle="modal" data-bs-target="#addSubscriptionModal" class="btn btn-primary mb-3">Add Subscription</a>
+
+<!-- Subscriptions List -->
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Amount</th>
+            <th>Billing Cycle</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for subscription in subscriptions %}
+        <tr>
+            <td>{{ subscription.name }}</td>
+            <td>${{ subscription.amount }}</td>
+            <td>{{ subscription.billing_cycle }}</td>
+            <td>{{ subscription.status }}</td>
+            <td>
+                {% if subscription.status == 'active' %}
+                    <form action="{{ url_for('deactivate_subscription', subscription_id=subscription.id) }}" method="POST" style="display:inline;">
+                        <button type="submit" class="btn btn-warning btn-sm">Deactivate</button>
+                    </form>
+                {% else %}
+                    <form action="{{ url_for('activate_subscription', subscription_id=subscription.id) }}" method="POST" style="display:inline;">
+                        <button type="submit" class="btn btn-success btn-sm">Activate</button>
+                    </form>
+                {% endif %}
+                <form action="{{ url_for('delete_subscription', subscription_id=subscription.id) }}" method="POST" style="display:inline;">
+                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<!-- Add Subscription Modal -->
+<div class="modal fade" id="addSubscriptionModal" tabindex="-1" aria-labelledby="addSubscriptionModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addSubscriptionModalLabel">Add Subscription</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="{{ url_for('subscriptions') }}" method="POST">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Subscription Name</label>
+                        <input type="text" class="form-control" id="name" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="amount" class="form-label">Amount</label>
+                        <input type="number" step="0.01" class="form-control" id="amount" name="amount" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="billing_cycle" class="form-label">Billing Cycle</label>
+                        <input type="text" class="form-control" id="billing_cycle" name="billing_cycle" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Add Subscription</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
